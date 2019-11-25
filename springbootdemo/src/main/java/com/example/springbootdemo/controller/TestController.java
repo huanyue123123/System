@@ -1,6 +1,6 @@
 package com.example.springbootdemo.controller;
 
-import com.example.springbootdemo.service.MsgRecevier;
+import com.example.springbootdemo.service.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,18 +9,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/test")
 public class TestController {
 
+
     @Autowired
-    private MsgRecevier msgRecevier;
+    private TestService testService;
 
-    @RequestMapping("/content")
-    public void content(String content){
-
-        msgRecevier.process(content);
-    }
 
     @RequestMapping("/test")
     public String test(String test){
 
         return test;
+    }
+
+    @RequestMapping("/downLoad")
+    public void downLoad() throws Exception {
+
+        testService.becomeExcel();
     }
 }
