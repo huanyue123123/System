@@ -8,6 +8,8 @@ import com.gm.wj.service.AdminMenuService;
 import com.gm.wj.service.AdminRoleMenuService;
 import com.gm.wj.service.AdminUserRoleService;
 import com.gm.wj.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+@Api(description = "图书管理")
 @RestController
 public class MenuController {
     @Autowired
@@ -27,6 +30,7 @@ public class MenuController {
     @Autowired
     AdminMenuService adminMenuService;
 
+    @ApiOperation(value = "菜单")
     @GetMapping("/api/menu")
     public List<AdminMenu> menu() {
         return respMenu(getMenuByCurrentUser());

@@ -3,6 +3,8 @@ package com.gm.wj.controller;
 import com.gm.wj.pojo.Book;
 import com.gm.wj.pojo.Search;
 import com.gm.wj.service.BookService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,16 +15,19 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
+@Api(description = "图书管理")
 @RestController
 public class LibraryController {
     @Autowired
     BookService bookService;
 
+    @ApiOperation(value = "列表")
     @GetMapping("/api/books")
     public List<Book> list() throws Exception {
         return bookService.list();
     }
 
+    @ApiOperation(value = "添加或修改")
     @PostMapping("/api/books")
     public Book addOrUpdate(@RequestBody Book book) throws Exception {
         System.out.println(book.getCategory());
@@ -30,11 +35,13 @@ public class LibraryController {
         return book;
     }
 
+    @ApiOperation(value = "删除")
     @PostMapping("/api/delete")
     public void delete(@RequestBody Book book) throws Exception {
         bookService.deleteById(book.getId());
     }
 
+    @ApiOperation(value = "检索")
     @PostMapping("/api/search")
     public List<Book> searchResult(@RequestBody Search s) throws Exception {
         if ("".equals(s.getKeywords())) {
@@ -44,6 +51,7 @@ public class LibraryController {
         }
     }
 
+    @ApiOperation(value = "按照分类查询书列表")
     @GetMapping("/api/categories/{cid}/books")
     public List<Book> listByCategory(@PathVariable("cid") int cid) throws Exception {
         if (0 != cid) {
@@ -53,6 +61,7 @@ public class LibraryController {
         }
     }
 
+    @ApiOperation(value = "上传")
     @PostMapping("api/covers")
     public String coversUpload(MultipartFile file, HttpServletRequest request) throws Exception {
         String folder = "D:/workspace/img";

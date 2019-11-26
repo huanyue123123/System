@@ -4,6 +4,8 @@ import com.gm.wj.pojo.User;
 import com.gm.wj.result.Result;
 import com.gm.wj.result.ResultFactory;
 import com.gm.wj.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -14,13 +16,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
 
+@Api(description = "登陆注册")
 @RestController
 public class LoginController {
 
     @Autowired
     UserService userService;
 
-    @PostMapping(value = "/api/login")
+    @ApiOperation(value = "登陆")
+    @GetMapping(value = "/api/login")
     public Result login(@RequestBody User requestUser) {
         String username = requestUser.getUsername();
         username = HtmlUtils.htmlEscape(username);
@@ -34,12 +38,13 @@ public class LoginController {
             // 生成随机 token 并存储在 session 中
             User user = userService.getByUserName(username);
             return ResultFactory.buildSuccessResult(usernamePasswordToken);
-        } catch (AuhenticationException e) {
+        } catch (Exception e) {
             String mtessage = "账号密码错误";
-            return ResultFactory.buildFailResult(message);
+            return ResultFactory.buildFailResult(mtessage);
         }
     }
 
+    @ApiOperation(value = "注册")
     @PostMapping("api/register")
     public Result register(@RequestBody User user) {
         String username = user.getUsername();
@@ -66,6 +71,7 @@ public class LoginController {
         return ResultFactory.buildSuccessResult(user);
     }
 
+    @ApiOperation(value = "登出")
     @GetMapping("api/logout")
     public Result logout() {
         Subject subject = SecurityUtils.getSubject();
@@ -74,6 +80,7 @@ public class LoginController {
         return ResultFactory.buildSuccessResult(message);
     }
 
+    @ApiOperation(value = "身份认证")
     @GetMapping(value = "api/authentication")
     public String authentication(){
         return "身份认证成功";
