@@ -1,97 +1,51 @@
 package com.gm.wj.controller;
 
-import com.gm.wj.pojo.Book;
-import com.gm.wj.pojo.Search;
-import com.gm.wj.service.BookService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
-import java.util.Random;
 
 @Api(description = "图书管理")
 @RestController
 public class LibraryController {
-    @Autowired
-    BookService bookService;
 
     @ApiOperation(value = "列表")
     @GetMapping("/api/books")
-    public List<Book> list() throws Exception {
-        return bookService.list();
+    public List<String> list() throws Exception {
+        return null;
     }
 
     @ApiOperation(value = "添加或修改")
     @PostMapping("/api/books")
-    public Book addOrUpdate(@RequestBody Book book) throws Exception {
-        System.out.println(book.getCategory());
-        bookService.addOrUpdate(book);
-        return book;
+    public String addOrUpdate(@RequestBody String book) throws Exception {
+        return null;
     }
 
     @ApiOperation(value = "删除")
     @PostMapping("/api/delete")
-    public void delete(@RequestBody Book book) throws Exception {
-        bookService.deleteById(book.getId());
+    public void delete(@RequestBody String book) throws Exception {
     }
 
     @ApiOperation(value = "检索")
     @PostMapping("/api/search")
-    public List<Book> searchResult(@RequestBody Search s) throws Exception {
-        if ("".equals(s.getKeywords())) {
-            return bookService.list();
-        } else {
-            return bookService.Search(s.getKeywords());
-        }
+    public List<String> searchResult(@RequestBody String s) throws Exception {
+        return null;
     }
 
     @ApiOperation(value = "按照分类查询书列表")
     @GetMapping("/api/categories/{cid}/books")
-    public List<Book> listByCategory(@PathVariable("cid") int cid) throws Exception {
-        if (0 != cid) {
-            return bookService.listByCategory(cid);
-        } else {
-            return list();
-        }
+    public List<String> listByCategory(@PathVariable("cid") int cid) throws Exception {
+        return null;
     }
 
     @ApiOperation(value = "上传")
     @PostMapping("api/covers")
     public String coversUpload(MultipartFile file, HttpServletRequest request) throws Exception {
-        String folder = "D:/workspace/img";
-        File imageFolder = new File(folder);
-        File f = new File(imageFolder, getRandomString(6) + file.getOriginalFilename()
-                .substring(file.getOriginalFilename().length() - 4));
-        String filename = file.getName();
-        if (!f.getParentFile().exists())
-            f.getParentFile().mkdirs();
-        try {
-            file.transferTo(f);
-//            System.out.println(file.getOriginalFilename());
-//            System.out.println("http://localhost:8443/api/file/" + f.getName());
-            String imgURL = "http://localhost:8443/api/file/" + f.getName();
-            return imgURL;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
+        return null;
     }
 
-    public String getRandomString(int length) {
-        String base = "abcdefghijklmnopqrstuvwxyz0123456789";
-        Random random = new Random();
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < length; i++) {
-            int number = random.nextInt(base.length());
-            sb.append(base.charAt(number));
-        }
-        return sb.toString();
-    }
 
 }
