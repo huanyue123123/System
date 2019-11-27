@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin
 @Api(description = "图书管理")
 @RestController
 public class LibraryController {
