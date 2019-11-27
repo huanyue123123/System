@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <!-- 配置生成器 -->
 <generatorConfiguration>
-    <properties resource="generator/jdbc.properties"></properties>
+    <properties resource="jdbc.properties"></properties>
     <context id="DB2Tables" targetRuntime="MyBatis3">
         <plugin type="org.mybatis.generator.plugins.SerializablePlugin"></plugin>
         <commentGenerator>

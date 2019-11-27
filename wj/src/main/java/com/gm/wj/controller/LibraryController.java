@@ -4,10 +4,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@CrossOrigin
 @Api(description = "图书管理")
 @RestController
 public class LibraryController {
@@ -41,10 +45,26 @@ public class LibraryController {
         return null;
     }
 
+    /**
+     * base64EncoderImg为最终图片转换为base64
+     * @param file
+     * @param request
+     * @return
+     * @throws Exception
+     */
     @ApiOperation(value = "上传")
     @PostMapping("api/covers")
-    public String coversUpload(MultipartFile file, HttpServletRequest request) throws Exception {
-        return null;
+    public Map<String,Object> coversUpload(MultipartFile file, HttpServletRequest request) throws Exception {
+        Map<String,Object> map = new HashMap<>();
+        if(file != null){
+            BASE64Encoder base64Encoder =new BASE64Encoder();
+            String fileName = file.getOriginalFilename();
+            String lastName = fileName.substring(fileName.lastIndexOf(".")+1);
+            String base64EncoderImg = "data:image/"+lastName+";base64,"+ base64Encoder.encode(file.getBytes());
+            map.put("base64",base64EncoderImg);
+            return map;
+        }
+        return map;
     }
 
 
