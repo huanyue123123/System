@@ -30,6 +30,7 @@ public class LoginController {
     public Result logout() {
         Subject subject = SecurityUtils.getSubject();
         subject.logout();
+        
         String message = "成功登出";
         return ResultFactory.buildSuccessResult(message);
     }
