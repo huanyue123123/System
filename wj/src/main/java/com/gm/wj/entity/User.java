@@ -1,6 +1,8 @@
 package com.gm.wj.entity;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 public class User implements Serializable {
     private Integer id;
@@ -12,6 +14,9 @@ public class User implements Serializable {
     private String name;
 
     private String salt;
+
+    private String checkCode;
+
 
     private static final long serialVersionUID = 1L;
 
@@ -53,5 +58,17 @@ public class User implements Serializable {
 
     public void setSalt(String salt) {
         this.salt = salt == null ? null : salt.trim();
+    }
+
+    public String getCheckCode() {
+        return checkCode;
+    }
+
+    public void setCheckCode(String checkCode) {
+        this.checkCode = checkCode;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
     }
 }

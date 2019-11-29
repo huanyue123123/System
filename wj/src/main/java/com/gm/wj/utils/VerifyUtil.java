@@ -1,4 +1,6 @@
 package com.gm.wj.utils;
+import sun.misc.BASE64Encoder;
+
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -7,7 +9,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 
 public class VerifyUtil {
@@ -44,8 +51,10 @@ public class VerifyUtil {
     /**
      * 生成随机图片
      */
-    public void getRandcode(HttpServletRequest request, HttpServletResponse response) {
-        HttpSession session = request.getSession();
+    public Map<String,Object> getRandcode(HttpServletRequest request, HttpServletResponse response, RedisUtil redisUtil) {
+        Map<String,Object> result = new HashMap<>();
+        String uuid =  "huanyue"+UUID.randomUUID();
+        result.put("uuid",uuid);
         // BufferedImage类是具有缓冲区的Image类,Image类是用于描述图像信息的类
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
         Graphics g = image.getGraphics();// 产生Image对象的Graphics对象,改对象可以在图像上进行各种绘制操作
@@ -61,18 +70,22 @@ public class VerifyUtil {
         for (int i = 1; i <= stringNum; i++) {
             randomString = drowString(g, randomString, i);
         }
-        //将生成的随机字符串保存到session中
-        session.removeAttribute(RANDOMCODEKEY);
-        session.setAttribute(RANDOMCODEKEY, randomString);
-        //设置失效时间1分钟
-        session.setMaxInactiveInterval(60);
+        redisUtil.set(uuid,randomString,60);
         g.dispose();
         try {
             // 将内存中的图片通过流动形式输出到客户端
-            ImageIO.write(image, "JPEG", response.getOutputStream());
+           // ImageIO.write(image, "JPEG", response.getOutputStream());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();//io流
+            ImageIO.write(image, "png", baos);//写入流中
+            byte[] bytes = baos.toByteArray();//转换成字节
+            BASE64Encoder encoder = new BASE64Encoder();
+            String png_base64 =  encoder.encodeBuffer(bytes).trim();//转换成base64串
+            png_base64 ="data:image/png;base64,"+ png_base64.replaceAll("\n", "").replaceAll("\r", "");//删除 \r\n
+            result.put("base64",png_base64);
         } catch (Exception e) {
+            e.printStackTrace();
         }
-
+        return result;
     }
 
     /**
