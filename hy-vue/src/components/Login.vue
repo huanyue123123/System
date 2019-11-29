@@ -61,6 +61,32 @@ export default {
       }
       callback();
     };
+    var checkVerify = (rule,value,callback) => {
+      if (!value) {
+        return callback(new Error('验证码'));
+      }
+      var regPwd = /^[a-zA-Z0-9]{4}$/;
+      if(!regPwd.test(value)){
+        return callback(new Error('验证码格式有误'));
+      }
+      let data = new FormData();
+      data.append('verify',value);
+      data.append('uuid',this.uuid);
+      this.$axios
+        .post('/checkVerify', data)
+        .then(successResponse => {
+
+          if(successResponse.data.code === 200){
+            callback();
+          }else{
+            return callback(new Error('验证码不正确'));
+          }
+        })
+        .catch(failResponse => {
+        })
+
+
+    };
 
     return {
       loginForm: {
@@ -68,7 +94,8 @@ export default {
         password: '',
         checkCode:''
       },
-      checkCode:this.$axios.defaults.baseURL + '/createImg',
+      uuid:"",
+      checkCode:"",
       rules: {
         username:[
           { validator: checkUser, trigger: 'blur' }
@@ -77,8 +104,7 @@ export default {
           { validator: checkPwd, trigger: 'blur' }
         ],
         checkCode:[
-          { required: true, message: '请输入验证码', trigger: 'blur' },
-          { min: 4, max: 4, message: '', trigger: 'blur' }
+          { validator: checkVerify, trigger: 'blur' }
         ]
       },
       responseResult: []
@@ -87,12 +113,17 @@ export default {
   methods: {
     login (formName) {
       this.$refs[formName].validate((valid) => {
-        console.log(valid + ";");
+        var map = {};
+        map["name"] = "key";
+        map["salt"] = "value";
+        var list  = [];
+        list.push(map);
         if (valid) {
           this.$axios
             .post('/login', {
               username: this.loginForm.username,
-              password: this.loginForm.password
+              password: this.loginForm.password,
+              checkCode:this.loginForm.checkCode
             })
             .then(successResponse => {
 
@@ -113,17 +144,33 @@ export default {
     },
     refreshCode(){
       this.$axios
-        .post('/createImg', {
+        .get('/createImg', {
 
         })
         .then(successResponse => {
-
-          var num=Math.ceil(Math.random()*10);
-          this.checkCode = this.$axios.defaults.baseURL + "/createImg?"+num;
+          if(successResponse.data.code === 200){
+            this.checkCode = successResponse.data.data.base64;
+            this.uuid = successResponse.data.data.uuid;
+          }
         })
         .catch(failResponse => {
         })
     }
+  },
+  mounted () {
+    this.$axios
+      .get('/createImg', {
+
+      })
+      .then(successResponse => {
+
+        if(successResponse.data.code === 200){
+          this.checkCode = successResponse.data.data.base64;
+          this.uuid = successResponse.data.data.uuid;
+        }
+      })
+      .catch(failResponse => {
+      })
   }
 }
 
