@@ -128,6 +128,7 @@ export default {
             .then(successResponse => {
 
               if (successResponse.data.code === 200) {
+                this.$store.commit('login',successResponse.data.data)
                 this.$router.replace({path: '/index'})
               }
             })

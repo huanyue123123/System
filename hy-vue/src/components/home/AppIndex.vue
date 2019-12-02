@@ -1,12 +1,21 @@
 <template>
   <div>
-    Hello World!
   </div>
 </template>
 
 <script>
   export default {
-    name: 'AppIndex'
+    name: 'AppIndex',
+    data(){
+
+      return {}
+    },
+    methods:{
+      logout(){
+        this.$store.commit("login",{"username":null});
+        this.$router.replace({path: '/login'})
+      }
+    }
   }
 </script>
 
