@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row style="height: 840px;">
-      <!--<search-bar></search-bar>-->
+      <search-bar @onSearch="searchResult" ref="searchBar"></search-bar>
       <el-tooltip effect="dark" placement="right"
                   v-for="item in books"
                   :key="item.id">
@@ -28,10 +28,10 @@
       <edit-book @onSubmit="loadBooks()" ref="edit"></edit-book>
     </el-row>
     <el-row>
-      <el-pagination
-        :current-page="1"
-        :page-size="10"
-        :total="20">
+      <el-pagination @current-change="handleCurrentChange"
+        :current-page="pageNo"
+        :page-size="pageSize"
+        :total="books.length">
       </el-pagination>
     </el-row>
   </div>
@@ -40,10 +40,11 @@
 <script>
 
   import EditBook from './EditBook'
+  import SearchBar from './SearchBar'
 
   export default {
     name: 'Books',
-    components: {EditBook},
+    components: {EditBook,SearchBar},
     data () {
       return {
         books: [
@@ -71,7 +72,9 @@
             press: '重庆出版社',
             abs: '文化大革命如火如荼进行的同时。军方探寻外星文明的绝秘计划“红岸工程”取得了突破性进展。但在按下发射键的那一刻，历经劫难的叶文洁没有意识到，她彻底改变了人类的命运。地球文明向宇宙发出的第一声啼鸣，以太阳为中心，以光速向宇宙深处飞驰……'
           }
-        ]
+        ],
+        pageSize:10,
+        pageNo:1
       }
     },
     methods:{
@@ -80,7 +83,23 @@
       },
       editBook(item){
         this.$refs.edit.dialogFormVisible = true;
-      }
+      },
+      handleCurrentChange: function (pageNo) {
+        this.pageNo = pageNo
+        console.log(this.pageNo)
+      },
+      searchResult () {
+        var _this = this
+        this.$axios
+          .post(this.$refs.searchBar.keywords + '/search', {
+
+          }).then(resp => {
+          if (resp && resp.data.code === 200) {
+            //_this.books = resp.data.data
+            console.log(resp.data);
+          }
+        })
+      },
 
     }
   }

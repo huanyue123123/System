@@ -1,14 +1,36 @@
 <template>
-  <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
-    <el-form :model="form">
-      <el-form-item label="活动名称" :label-width="formLabelWidth">
-        <el-input v-model="form.name" autocomplete="off"></el-input>
+  <el-dialog width = "50%" title="添加/修改图书" :visible.sync="dialogFormVisible" @close="clear">
+    <el-form :model="form" >
+      <el-form-item label="书名" :label-width="formLabelWidth" prop="title">
+        <el-input v-model="form.title" autocomplete="off"></el-input>
       </el-form-item>
-      <el-form-item label="活动区域" :label-width="formLabelWidth">
-        <el-select v-model="form.region" placeholder="请选择活动区域">
-          <el-option label="区域一" value="shanghai"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
+      <el-form-item label="作者" :label-width="formLabelWidth" prop="author">
+        <el-input v-model="form.author" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item label="出版日期" :label-width="formLabelWidth" prop="date">
+        <el-input v-model="form.date" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item label="出版社" :label-width="formLabelWidth" prop="press">
+        <el-input v-model="form.press" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item label="封面" :label-width="formLabelWidth" prop="cover">
+        <el-input v-model="form.cover" autocomplete="off" placeholder="图片 URL"></el-input>
+      </el-form-item>
+      <el-form-item label="简介" :label-width="formLabelWidth" prop="abs">
+        <el-input type="textarea" v-model="form.abs" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item label="分类" :label-width="formLabelWidth" prop="category.id">
+        <el-select v-model="form.category.id" filterable placeholder="请选择分类"  class = "categorys">
+          <el-option
+            v-for="item in cates"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
         </el-select>
+      </el-form-item>
+      <el-form-item prop="id" style="height: 0" >
+        <el-input type="hidden" v-model="form.id" autocomplete="off"></el-input>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -25,26 +47,94 @@
       return {
         dialogFormVisible: false,
         form: {
-          name: '',
-          region: '',
-          date1: '',
-          date2: '',
-          delivery: false,
-          type: [],
-          resource: '',
-          desc: ''
+          id: '',
+          title: '',
+          author: '',
+          date: '',
+          press: '',
+          cover: '',
+          abs: '',
+          category: {
+            id: '',
+            name: ''
+          }
         },
+        cates:[{
+          id:1,
+          name:'文学'
+        },{
+          id:2,
+          name:'流行'
+        },{
+          id:3,
+          name:'文化'
+        },{
+          id:4,
+          name:'生活'
+        },{
+          id:5,
+          name:'经管'
+        },{
+          id:6,
+          name:'科技'
+        }],
         formLabelWidth: '120px'
       };
     },
+    mounted(){
+      this.initCates();
+    },
     methods:{
+      initCates(){
+        this.$axios.get('/categories/cateList',{
+
+        }).then(res => {
+          if(res && res.data.code === 200){
+            console.log(res.data.data);
+            this.cates = res.data.data;
+          }
+        })
+      },
+      clear () {
+        this.form = {
+          id: '',
+          title: '',
+          author: '',
+          date: '',
+          press: '',
+          cover: '',
+          abs: '',
+          category: ''
+        }
+      },
       onSubmit(){
-        this.dialogFormVisible = false;
-        this.$emit('onSubmit')
+        this.$axios.post('/saveBooks',{
+          id: this.form.id,
+          cover: this.form.cover,
+          title: this.form.title,
+          author: this.form.author,
+          date: this.form.date,
+          press: this.form.press,
+          abs: this.form.abs,
+          cid: this.form.category.id
+        }).then(res => {
+          if(res && res.data.code === 200){
+            this.dialogFormVisible = false;
+            this.$emit('onSubmit')
+            console.log(res.data.data);
+          }
+        })
+
+
       }
     }
   };
 </script>
 <style scoped>
-
+.categorys{
+  width:100%;
+}
+  .editContainer{
+    width:50%;
+  }
 </style>
