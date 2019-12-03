@@ -5,7 +5,7 @@
       <SideMenu></SideMenu>
     </el-aside>
     <el-main>
-      <Books></Books>
+      <Books class = "books-area"></Books>
     </el-main>
   </el-container>
 </template>
@@ -22,5 +22,4 @@
 </script>
 
 <style scoped>
-
 </style>
