@@ -2,10 +2,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.gm</groupId>
 	<artifactId>wj</artifactId>
-	<version>1.0.0</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<name>wj</name>
 	<description>White Jotter - Your Mind Palace</description>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -197,6 +197,22 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>com.gm.wj.WjApplication</mainClass>
+					<fork>true</fork>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>2.1.1.RELEASE</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.mybatis.generator</groupId>
