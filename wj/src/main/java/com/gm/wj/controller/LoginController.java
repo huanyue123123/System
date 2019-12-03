@@ -5,6 +5,7 @@ import com.gm.wj.entity.User;
 import com.gm.wj.result.Result;
 import com.gm.wj.result.ResultCode;
 import com.gm.wj.result.ResultFactory;
+import com.gm.wj.service.UserService;
 import com.gm.wj.utils.RedisUtil;
 import com.gm.wj.utils.SendMessageUtil;
 import com.gm.wj.utils.VerifyUtil;
@@ -31,11 +32,19 @@ public class LoginController {
     @Autowired
     private SendMessagePropertis prop;
 
+    @Autowired
+    private UserService userService;
+
     @ApiOperation(value = "登陆")
     @PostMapping(value = "/api/login")
     public Result login(@RequestBody User requestUser,HttpServletRequest request) {
         if (requestUser != null) {
-            return ResultFactory.buildResult(ResultCode.SUCCESS, "ok",requestUser);
+            User user = userService.login(requestUser);
+            if(user != null){
+                return ResultFactory.buildResult(ResultCode.SUCCESS, "ok",user);
+            }
+            return ResultFactory.buildResult(ResultCode.FAIL, "账号或密码错误", requestUser);
+
         }
         return ResultFactory.buildResult(ResultCode.FAIL, "参数为空", requestUser);
     }

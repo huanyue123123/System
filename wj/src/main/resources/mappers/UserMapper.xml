@@ -12,7 +12,7 @@
     id, username, password, name, salt
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from user
     where id = #{id,jdbcType=INTEGER}
@@ -25,9 +25,9 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into user (username, password, name, 
+    insert into user (username, password, name,
       salt)
-    values (#{username,jdbcType=CHAR}, #{password,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+    values (#{username,jdbcType=CHAR}, #{password,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
       #{salt,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.gm.wj.entity.User">
@@ -90,4 +90,15 @@
       salt = #{salt,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="selectUserByEntity" resultMap="BaseResultMap" parameterType="com.gm.wj.entity.User">
+    SELECT
+        <include refid="Base_Column_List" />
+    FROM
+        user
+    WHERE
+        1 != 1 OR
+    <if test="username != null and password != null">
+      username = #{username} AND password = #{password}
+    </if>
+  </select>
 </mapper>
