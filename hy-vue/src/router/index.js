@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
 import AppIndex from '@/components/home/AppIndex'
 import Login from '@/components/Login'
 import Home from '@/components/Home'
+import Library from '@/components/library/LibraryIndex'
+import SideMenu from '../components/library/SideMenu'
 
 Vue.use(Router)
 
@@ -26,9 +27,9 @@ export default new Router({
           }
         },
         {
-          path: '/hello',
-          name: 'HelloWorld',
-          component: HelloWorld,
+          path: '/library',
+          name: 'Library',
+          component: Library,
           meta:{
             requireAuth:true
           }

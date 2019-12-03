@@ -15,8 +15,8 @@
       return {
         navList: [
           {name: '/index', navItem: '首页'},
-          {name: '/hello', navItem: '笔记本'},
-          {name: '/', navItem: '图书馆'},
+          {name: '/', navItem: '笔记本'},
+          {name: '/library', navItem: '图书馆'},
           {name: '/', navItem: '个人中心'}
         ]
       }
