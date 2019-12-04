@@ -95,9 +95,11 @@ public class LoginController {
     public Result createImg(String verify,String uuid,HttpServletRequest request) throws Exception {
         Object trueVerify = redisUtil.get(uuid);
         if(trueVerify!= null && trueVerify.equals(verify)){
-            return ResultFactory.buildResult(ResultCode.SUCCESS, "ok", "");
+            return ResultFactory.buildResult(ResultCode.SUCCESS, "验证码正确", "");
+        }else if(trueVerify != null){
+            return ResultFactory.buildResult(ResultCode.FAIL, "验证码不正确", "");
         }else{
-            return ResultFactory.buildResult(ResultCode.FAIL, "fail", "");
+            return ResultFactory.buildResult(ResultCode.NOT_FOUND,"请刷新验证码","");
         }
     }
 
