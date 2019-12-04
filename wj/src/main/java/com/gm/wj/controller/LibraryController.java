@@ -5,8 +5,10 @@ import com.gm.wj.entity.Category;
 import com.gm.wj.result.Result;
 import com.gm.wj.result.ResultCode;
 import com.gm.wj.result.ResultFactory;
+import com.gm.wj.service.BookService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sun.misc.BASE64Encoder;
@@ -21,16 +23,37 @@ import java.util.Map;
 @RestController
 public class LibraryController {
 
+    @Autowired
+    private BookService bookService;
+
     @ApiOperation(value = "列表")
-    @GetMapping("/api/books")
-    public Result list() throws Exception {
-        return null;
+    @PostMapping("/api/books")
+    public Result list(@RequestBody Book book) throws Exception {
+        return ResultFactory.buildResult(ResultCode.SUCCESS,"操作成功",bookService.bookList(book));
     }
 
     @ApiOperation(value = "添加或修改")
     @PostMapping("/api/saveBooks")
     public Result addOrUpdate(@RequestBody Book book) throws Exception {
-        return ResultFactory.buildResult(ResultCode.SUCCESS,"OK",book);
+        Integer result = bookService.saveBook(book);
+        if(result > 0){
+            return ResultFactory.buildResult(ResultCode.SUCCESS,"操作成功","");
+        }
+        return ResultFactory.buildResult(ResultCode.FAIL,"操作失败","");
+
+    }
+
+    @ApiOperation(value = "详情")
+    @PostMapping("/api/{id}/detail")
+    public Result detail(@PathVariable("id") Integer id) throws Exception {
+        Book book = bookService.detail(id);
+        book.setCategory(new Category());
+        book.getCategory().setId(book.getCid());
+        if (book == null){
+            return ResultFactory.buildResult(ResultCode.FAIL,"详情获取失败","");
+        }else{
+            return ResultFactory.buildResult(ResultCode.SUCCESS,"获取详情成功",book);
+        }
     }
 
     @ApiOperation(value = "删除")
@@ -85,27 +108,6 @@ public class LibraryController {
         return ResultFactory.buildResult(ResultCode.SUCCESS,"ok",categoryList);
     }
 
-    /**
-     * base64EncoderImg为最终图片转换为base64
-     * @param file
-     * @param request
-     * @return
-     * @throws Exception
-     */
-    @ApiOperation(value = "上传")
-    @PostMapping("api/covers")
-    public Result coversUpload(MultipartFile file, HttpServletRequest request) throws Exception {
-        Map<String,Object> map = new HashMap<>();
-        if(file != null){
-            BASE64Encoder base64Encoder =new BASE64Encoder();
-            String fileName = file.getOriginalFilename();
-            String lastName = fileName.substring(fileName.lastIndexOf(".")+1);
-            String base64EncoderImg = "data:image/"+lastName+";base64,"+ base64Encoder.encode(file.getBytes());
-            map.put("base64",base64EncoderImg);
-            return ResultFactory.buildResult(ResultCode.SUCCESS,"OK",map);
-        }
-        return ResultFactory.buildResult(ResultCode.FAIL,"文件上传失败,未接收到文件",null);
-    }
 
 
 }

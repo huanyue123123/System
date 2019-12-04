@@ -1,8 +1,11 @@
 package com.gm.wj.entity;
 
-import java.io.Serializable;
+import org.springframework.format.annotation.DateTimeFormat;
 
-public class Book implements Serializable {
+import java.io.Serializable;
+import java.util.Date;
+
+public class Book extends PageEntity implements Serializable  {
     private Integer id;
 
     private String cover;
@@ -18,6 +21,10 @@ public class Book implements Serializable {
     private String abs;
 
     private Integer cid;
+
+    private Category category;
+
+    private Date createDate;
 
     private static final long serialVersionUID = 1L;
 
@@ -53,14 +60,6 @@ public class Book implements Serializable {
         this.author = author == null ? null : author.trim();
     }
 
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date == null ? null : date.trim();
-    }
-
     public String getPress() {
         return press;
     }
@@ -83,5 +82,29 @@ public class Book implements Serializable {
 
     public void setCid(Integer cid) {
         this.cid = cid;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }
