@@ -1,5 +1,5 @@
 package com.gm.wj.utils;
-import sun.misc.BASE64Encoder;
+import org.apache.commons.codec.binary.Base64;;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -78,8 +78,8 @@ public class VerifyUtil {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();//io流
             ImageIO.write(image, "png", baos);//写入流中
             byte[] bytes = baos.toByteArray();//转换成字节
-            BASE64Encoder encoder = new BASE64Encoder();
-            String png_base64 =  encoder.encodeBuffer(bytes).trim();//转换成base64串
+            //BASE64Encoder encoder = new BASE64Encoder();
+            String png_base64 =  Base64.encodeBase64String(bytes).trim();//转换成base64串
             png_base64 ="data:image/png;base64,"+ png_base64.replaceAll("\n", "").replaceAll("\r", "");//删除 \r\n
             result.put("base64",png_base64);
         } catch (Exception e) {
