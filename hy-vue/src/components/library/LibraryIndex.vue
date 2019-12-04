@@ -26,7 +26,6 @@
         this.$axios.get(url).then(resp => {
           if (resp && resp.data.code === 200) {
             //_this.$refs.booksArea.books = resp.data.data;
-            console.log(resp.data.data);
           }
         })
       }

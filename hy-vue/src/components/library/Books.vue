@@ -20,6 +20,7 @@
           <div class="info">
             <div class="title">
               <a href="">{{item.title}}</a>
+              <i class="el-icon-delete" @click="deleteBook(item.id)"></i>
             </div>
           </div>
           <div class="author">{{item.author}}</div>
@@ -47,46 +48,34 @@
     components: {EditBook,SearchBar},
     data () {
       return {
-        books: [
-          {
-            cover: 'https://i.loli.net/2019/04/10/5cada7e73d601.jpg',
-            title: '三体',
-            author: '刘慈欣',
-            date: '2019-05-05',
-            press: '重庆出版社',
-            abs: '文化大革命如火如荼进行的同时。军方探寻外星文明的绝秘计划“红岸工程”取得了突破性进展。但在按下发射键的那一刻，历经劫难的叶文洁没有意识到，她彻底改变了人类的命运。地球文明向宇宙发出的第一声啼鸣，以太阳为中心，以光速向宇宙深处飞驰……'
-          },
-          {
-            cover: 'https://i.loli.net/2019/04/10/5cada7e73d601.jpg',
-            title: '三体',
-            author: '刘慈欣',
-            date: '2019-05-05',
-            press: '重庆出版社',
-            abs: '文化大革命如火如荼进行的同时。军方探寻外星文明的绝秘计划“红岸工程”取得了突破性进展。但在按下发射键的那一刻，历经劫难的叶文洁没有意识到，她彻底改变了人类的命运。地球文明向宇宙发出的第一声啼鸣，以太阳为中心，以光速向宇宙深处飞驰……'
-          },
-          {
-            cover: 'https://i.loli.net/2019/04/10/5cada7e73d601.jpg',
-            title: '三体',
-            author: '刘慈欣',
-            date: '2019-05-05',
-            press: '重庆出版社',
-            abs: '文化大革命如火如荼进行的同时。军方探寻外星文明的绝秘计划“红岸工程”取得了突破性进展。但在按下发射键的那一刻，历经劫难的叶文洁没有意识到，她彻底改变了人类的命运。地球文明向宇宙发出的第一声啼鸣，以太阳为中心，以光速向宇宙深处飞驰……'
-          }
-        ],
+        books: [],
         pageSize:10,
         pageNo:1
       }
     },
+    mounted(){
+      this.loadBooks();
+    },
     methods:{
       loadBooks(){
-        alert("loadBooks");
+        this.$axios.post('/books',{pageNo:this.pageNo,pageSize: this.pageSize}).then(result => {
+          if(result.data.code === 200){
+            this.books = result.data.data;
+          }
+        })
       },
       editBook(item){
+
         this.$refs.edit.dialogFormVisible = true;
+        this.$axios.post(item.id + '/detail',{}).then(result => {
+            if(result.data.code === 200){
+              this.$refs.edit.form =result.data.data;
+            }
+        })
+
       },
       handleCurrentChange: function (pageNo) {
         this.pageNo = pageNo
-        console.log(this.pageNo)
       },
       searchResult () {
         var _this = this
@@ -96,9 +85,29 @@
           }).then(resp => {
           if (resp && resp.data.code === 200) {
             //_this.books = resp.data.data
-            console.log(resp.data);
           }
         })
+      },
+      deleteBook (id) {
+        this.$confirm('此操作将永久删除该书籍, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+            this.$axios
+              .post('/delete', {id: id}).then(resp => {
+              if (resp && resp.status === 200) {
+                this.loadBooks()
+              }
+            })
+          }
+        ).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+        // alert(id)
       },
 
     }
@@ -144,5 +153,9 @@
 
   a:link, a:visited, a:focus {
     color: #3377aa;
+  }
+  .el-icon-delete {
+    cursor: pointer;
+    float: right;
   }
 </style>
