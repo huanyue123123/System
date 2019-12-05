@@ -113,4 +113,15 @@ public class LoginController {
         return ResultFactory.buildResult(ResultCode.SUCCESS, ""+ res, prop);
     }
 
+    @PostMapping("api/getWeather")
+    @ApiOperation(value = "获取天气")
+    public Result getWeather(@RequestParam("place") String place){
+        try {
+            return ResultFactory.buildResult(ResultCode.SUCCESS,"OK",userService.weather(place));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResultFactory.buildResult(ResultCode.FAIL,e.getMessage(),"");
+        }
+    }
+
 }

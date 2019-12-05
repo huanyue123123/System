@@ -58,7 +58,12 @@ public class LibraryController {
 
     @ApiOperation(value = "删除")
     @PostMapping("/api/delete")
-    public void delete(@RequestBody String book) throws Exception {
+    public Result delete(List<Integer> ids) throws Exception {
+        Integer deleteCount = bookService.deleteBook(ids);
+        if(deleteCount > 0){
+            return ResultFactory.buildResult(ResultCode.SUCCESS,"删除成功,删除了"+deleteCount+"条数据",deleteCount);
+        }
+        return ResultFactory.buildResult(ResultCode.FAIL,"删除失败",0);
     }
 
     @ApiOperation(value = "检索")

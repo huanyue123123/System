@@ -37,4 +37,11 @@ public class BookService {
     }
 
 
+    public Integer deleteBook(List<Integer> ids){
+        if(ids != null){
+                return bookMapper.deleteByPrimaryKeyList(ids);
+        }
+        return 0;
+    }
+
 }
