@@ -14,26 +14,24 @@ import org.springframework.web.multipart.MultipartFile;
 import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Api(description = "图书管理")
 @RestController
+@RequestMapping("/api")
 public class LibraryController {
 
     @Autowired
     private BookService bookService;
 
     @ApiOperation(value = "列表")
-    @PostMapping("/api/books")
+    @PostMapping("/books")
     public Result list(@RequestBody Book book) throws Exception {
         return ResultFactory.buildResult(ResultCode.SUCCESS,"操作成功",bookService.bookList(book));
     }
 
     @ApiOperation(value = "添加或修改")
-    @PostMapping("/api/saveBooks")
+    @PostMapping("/saveBooks")
     public Result addOrUpdate(@RequestBody Book book) throws Exception {
         Integer result = bookService.saveBook(book);
         if(result > 0){
@@ -44,7 +42,7 @@ public class LibraryController {
     }
 
     @ApiOperation(value = "详情")
-    @PostMapping("/api/{id}/detail")
+    @PostMapping("/{id}/detail")
     public Result detail(@PathVariable("id") Integer id) throws Exception {
         Book book = bookService.detail(id);
         book.setCategory(new Category());
@@ -57,8 +55,20 @@ public class LibraryController {
     }
 
     @ApiOperation(value = "删除")
-    @PostMapping("/api/delete")
-    public Result delete(List<Integer> ids) throws Exception {
+    @PostMapping("/deleteByIds/{ids}")
+    public Result deleteByIds(@PathVariable("ids")List<Integer> ids) throws Exception {
+        Integer deleteCount = bookService.deleteBook(ids);
+        if(deleteCount > 0){
+            return ResultFactory.buildResult(ResultCode.SUCCESS,"删除成功,删除了"+deleteCount+"条数据",deleteCount);
+        }
+        return ResultFactory.buildResult(ResultCode.FAIL,"删除失败",0);
+    }
+
+    @ApiOperation(value = "删除")
+    @PostMapping("/deleteById/{id}")
+    public Result deleteById(@PathVariable("id")Integer id) throws Exception {
+        List ids = new ArrayList();
+        ids.add(id);
         Integer deleteCount = bookService.deleteBook(ids);
         if(deleteCount > 0){
             return ResultFactory.buildResult(ResultCode.SUCCESS,"删除成功,删除了"+deleteCount+"条数据",deleteCount);
@@ -67,20 +77,14 @@ public class LibraryController {
     }
 
     @ApiOperation(value = "检索")
-    @PostMapping("/api/{keywords}/search")
+    @PostMapping("/{keywords}/search")
     public Result searchResult(@PathVariable("keywords") String keywords) throws Exception {
         return ResultFactory.buildResult(ResultCode.SUCCESS,"OK",keywords);
     }
 
-    @ApiOperation(value = "按照分类查询书列表")
-    @GetMapping("/api/categories/{cid}/books")
-    public Result listByCategory(@PathVariable("cid") int cid) throws Exception {
-
-        return ResultFactory.buildResult(ResultCode.SUCCESS,"ok",cid);
-    }
 
     @ApiOperation(value = "图书分类列表")
-    @GetMapping("/api/categories/cateList")
+    @GetMapping("/categories/cateList")
     public Result cateList() throws Exception {
         List<Category> categoryList = new LinkedList<>();
         Category category = new Category();

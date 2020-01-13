@@ -144,16 +144,6 @@
 			<artifactId>druid-spring-boot-starter</artifactId>
 			<version>1.1.1</version>
 		</dependency>
-		<!--<dependency>
-			<groupId>org.bytedeco</groupId>
-			<artifactId>javacv-platform</artifactId>
-			<version>1.5.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.madgag</groupId>
-			<artifactId>animated-gif-lib</artifactId>
-			<version>1.4</version>
-		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>

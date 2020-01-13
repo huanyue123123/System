@@ -24,6 +24,7 @@ import java.util.Map;
 
 @Api(description = "登陆注册")
 @RestController
+@RequestMapping("/api/login")
 public class LoginController {
 
     @Autowired
@@ -36,7 +37,7 @@ public class LoginController {
     private UserService userService;
 
     @ApiOperation(value = "登陆")
-    @PostMapping(value = "/api/login")
+    @PostMapping(value = "/login")
     public Result login(@RequestBody User requestUser,HttpServletRequest request) {
         if (requestUser != null) {
             User user = userService.login(requestUser);
@@ -50,13 +51,13 @@ public class LoginController {
     }
 
     @ApiOperation(value = "注册")
-    @PostMapping("api/register")
+    @PostMapping("/register")
     public Result register(@RequestBody String user) {
         return null;
     }
 
     @ApiOperation(value = "登出")
-    @GetMapping("api/logout")
+    @GetMapping("/logout")
     public Result logout() {
         Subject subject = SecurityUtils.getSubject();
         subject.logout();
@@ -65,13 +66,8 @@ public class LoginController {
         return ResultFactory.buildSuccessResult(message);
     }
 
-    @ApiOperation(value = "身份认证")
-    @GetMapping(value = "api/authentication")
-    public String authentication() {
-        return "身份认证成功";
-    }
 
-    @GetMapping("api/createImg")
+    @GetMapping("/createImg")
     @ApiOperation(value = "图形验证码生成")
     public Result createImg(HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
@@ -90,7 +86,7 @@ public class LoginController {
         }
     }
 
-    @PostMapping("api/checkVerify")
+    @PostMapping("/checkVerify")
     @ApiOperation(value = "验证码校验")
     public Result createImg(String verify,String uuid,HttpServletRequest request) throws Exception {
         Object trueVerify = redisUtil.get(uuid);
@@ -103,7 +99,7 @@ public class LoginController {
         }
     }
 
-    @PostMapping("api/getPhoneCode")
+    @PostMapping("/getPhoneCode")
     @ApiOperation(value = "手机验证码")
     public Result getPhoneCode(@RequestBody User user) throws Exception {
 
@@ -113,7 +109,7 @@ public class LoginController {
         return ResultFactory.buildResult(ResultCode.SUCCESS, ""+ res, prop);
     }
 
-    @PostMapping("api/getWeather")
+    @PostMapping("/getWeather")
     @ApiOperation(value = "获取天气")
     public Result getWeather(@RequestParam("place") String place){
         try {

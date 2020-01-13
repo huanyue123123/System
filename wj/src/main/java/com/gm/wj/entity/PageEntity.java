@@ -6,6 +6,11 @@ public class PageEntity {
 
     private Integer pageSize;
 
+    public PageEntity(){
+        this.pageNo = 1;
+        this.pageSize = 10;
+    }
+
     public Integer getPageNo() {
         return pageNo;
     }

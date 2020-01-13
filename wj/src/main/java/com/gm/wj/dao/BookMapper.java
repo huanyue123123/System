@@ -1,6 +1,7 @@
 package com.gm.wj.dao;
 
 import com.gm.wj.entity.Book;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
 public interface BookMapper {
     int deleteByPrimaryKey(Integer id);
 
-    int deleteByPrimaryKeyList(List<Integer> id);
+    int deleteByPrimaryKeyList(@Param("ids") List<Integer> id);
 
     int insert(Book record);
 
