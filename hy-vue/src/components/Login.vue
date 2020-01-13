@@ -80,7 +80,7 @@ export default {
       data.append('verify',value);
       data.append('uuid',this.uuid);
       this.$axios
-        .post('/checkVerify', data)
+        .post('/login/checkVerify', data)
         .then(successResponse => {
 
           if(successResponse.data.code === 200){
@@ -131,7 +131,7 @@ export default {
         list.push(map);
         if (valid) {
           this.$axios
-            .post('/login', {
+            .post('/login/login', {
               username: this.loginForm.username,
               password: this.loginForm.password,
               checkCode:this.loginForm.checkCode
@@ -159,7 +159,7 @@ export default {
     },
     refreshCode(){
       this.$axios
-        .get('/createImg', {
+        .get('/login/createImg', {
 
         })
         .then(successResponse => {
@@ -174,7 +174,7 @@ export default {
   },
   mounted () {
     this.$axios
-      .get('/createImg', {
+      .get('/login/createImg', {
 
       })
       .then(successResponse => {

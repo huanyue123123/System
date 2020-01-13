@@ -94,9 +94,15 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
+            var ids = [];
+            ids.push(id);
             this.$axios
-              .post('/delete', {id: id}).then(resp => {
+              .post('/deleteByIds/'+ids).then(resp => {
               if (resp && resp.status === 200) {
+                this.$message({
+                  type: 'info',
+                  message: '已删除'
+                })
                 this.loadBooks()
               }
             })

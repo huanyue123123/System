@@ -22,10 +22,11 @@
       listByCategory () {
         var _this = this
         var cid = this.$refs.sideMenu.cid
-        var url = 'categories/' + cid + '/books'
-        this.$axios.get(url).then(resp => {
+        var url = '/books'
+        this.$axios.post(url,{"cid":cid}).then(resp => {
           if (resp && resp.data.code === 200) {
-            //_this.$refs.booksArea.books = resp.data.data;
+            console.log(resp.data.data);
+            _this.$refs.booksArea.books = resp.data.data;
           }
         })
       }
