@@ -1,98 +1,223 @@
 <template>
-  <body id="paper">
-    <el-form :rules="rules" class="login-container" label-position="left"
-             label-width="0px" v-loading="loading">
-      <h3 class="login_title">系统登录</h3>
-      <el-form-item prop="username">
-        <el-input type="text" v-model="loginForm.username"
-                  auto-complete="off" placeholder="账号"></el-input>
+  <body id="poster">
+
+    <el-form label-position="left" class = "login-container" hide-required-asterisk :model="loginForm" :rules="rules" ref = "loginForm"
+             label-width="80px">
+      <el-alert v-show="inputError"
+                title="账号或密码错误"
+                type="error"
+                center
+                show-icon>
+      </el-alert>
+      <el-form-item label="账号" prop="username">
+        <el-input type = "text" v-model =  "loginForm.username" placeholder="请输入账号" auto-complete="off" minlength = "6"> </el-input>
       </el-form-item>
-      <el-form-item prop="password">
-        <el-input type="password" v-model="loginForm.password"
-                  auto-complete="off" placeholder="密码"></el-input>
+
+      <el-form-item label="密码" prop="password">
+        <el-input type="password" v-model="loginForm.password" placeholder="请输入密码" auto-complete="off" show-password> </el-input>
       </el-form-item>
-      <el-checkbox class="login_remember" v-model="checked"
-                   label-position="left"><span style="color: #505458">记住密码</span></el-checkbox>
+      <el-form-item label="验证码" prop="checkCode">
+        <el-row  >
+          <el-col :xs="12" :md="12" :sm="12" :lg="12">
+            <el-input type="text"  v-model="loginForm.checkCode" placeholder="请输入验证码" auto-complete="off" > </el-input>
+          </el-col>
+          <el-col :xs="12" :md="12" :sm="12" :lg="12" >
+            <div class="identifybox">
+              <div @click="refreshCode">
+                <el-image :src="checkCode" style="height:40px"  ></el-image>
+              </div>
+              <el-button @click="refreshCode" type='text' class="textbtn">看不清，换一张</el-button>
+            </div>
+          </el-col>
+
+        </el-row>
+
+      </el-form-item>
+      <el-form-item>
+
+      </el-form-item>
       <el-form-item style="width: 100%">
-        <el-button type="primary" style="width: 40%;background: #505458;border: none" v-on:click="login">登录</el-button>
-        <router-link to="register"><el-button type="primary" style="width: 40%;background: #505458;border: none">注册</el-button></router-link>
+        <el-button type="primary" style="width: 100%;background: #505458;border: none" v-on:click="login('loginForm')">登录</el-button>
       </el-form-item>
     </el-form>
   </body>
 </template>
+
 <script>
-  export default{
-    data () {
-      return {
-        rules: {
-          username: [{required: false, message: '用户名不能为空', trigger: 'blur'}],
-          password: [{required: false, message: '密码不能为空', trigger: 'blur'}]
-        },
-        checked: true,
-        loginForm: {
-          username: '',
-          password: ''
-        },
-        loading: false
+export default {
+  name: 'Login',
+  data () {
+    var checkUser = (rule,value,callback) => {
+      if (!value) {
+        return callback(new Error('账号不能为空'));
       }
-    },
-    methods: {
-      login () {
-        var _this = this
-        this.$axios
-          .post('/login', {
-            username: this.loginForm.username,
-            password: this.loginForm.password
-          })
-          .then(resp => {
-            if (resp.data.code === 200) {
-              var data = resp.data.data
-              _this.$store.commit('login', data)
-              var path = _this.$route.query.redirect
-              _this.$router.replace({path: path === '/' || path === undefined ? '/admin' : path})
-                console.log(data)
-            }
-          })
-          .catch(failResponse => {})
+      var regUser = /^[a-zA-Z][a-zA-Z0-9]{4,13}[a-zA-Z]$/;
+      if(!regUser.test(value)){
+        return callback(new Error('账号开头结尾必须为字母且长度6-15'));
       }
+      callback();
+
+    };
+    var checkPwd = (rule,value,callback) => {
+      if (!value) {
+        return callback(new Error('密码不能为空'));
       }
+      var regPwd = /^[a-zA-Z][a-zA-Z0-9]{5,14}$/;
+      if(!regPwd.test(value)){
+        return callback(new Error('密码以字母开头长度6-15，且不包含特殊符号'));
+      }
+      callback();
+    };
+    var checkVerify = (rule,value,callback) => {
+      if (!value) {
+        return callback(new Error('验证码'));
+      }
+      var regPwd = /^[a-zA-Z0-9]{4}$/;
+      if(!regPwd.test(value)){
+        return callback(new Error('验证码格式有误'));
+      }
+      let data = new FormData();
+      data.append('verify',value);
+      data.append('uuid',this.uuid);
+      this.$axios
+        .post('/login/checkVerify', data)
+        .then(successResponse => {
+
+          if(successResponse.data.code === 200){
+            callback();
+          }else if(successResponse.data.code === 400){
+            return callback(new Error('验证码不正确'));
+          }else{
+            this.refreshCode();
+            return callback(new Error('验证码过期，请重新输入'));
+          }
+        })
+        .catch(failResponse => {
+        })
+
+
+    };
+
+    return {
+      loginForm: {
+        username: '',
+        password: '',
+        checkCode:''
+      },
+      uuid:"",
+      checkCode:"",
+      rules: {
+        username:[
+          { validator: checkUser, trigger: 'blur' }
+        ],
+        password:[
+          { validator: checkPwd, trigger: 'blur' }
+        ],
+        checkCode:[
+          { validator: checkVerify, trigger: 'blur' }
+        ]
+      },
+      responseResult: [],
+      inputError:false
     }
+  },
+  methods: {
+    login (formName) {
+      this.$refs[formName].validate((valid) => {
+        var map = {};
+        map["name"] = "key";
+        map["salt"] = "value";
+        var list  = [];
+        list.push(map);
+        if (valid) {
+          this.$axios
+            .post('/login/login', {
+              username: this.loginForm.username,
+              password: this.loginForm.password,
+              checkCode:this.loginForm.checkCode
+            })
+            .then(successResponse => {
+
+              if (successResponse.data.code === 200) {
+                this.$store.commit('login',successResponse.data.data)
+                this.$router.replace({path: '/index'})
+              }else if(successResponse.data.code === 400){
+                this.inputError = true;
+                this.refreshCode();
+              }
+            })
+            .catch(failResponse => {
+            })
+        } else {
+
+          console.log('error submit!!');
+          return false;
+        }
+      });
+
+
+    },
+    refreshCode(){
+      this.$axios
+        .get('/login/createImg', {
+
+        })
+        .then(successResponse => {
+          if(successResponse.data.code === 200){
+            this.checkCode = successResponse.data.data.base64;
+            this.uuid = successResponse.data.data.uuid;
+          }
+        })
+        .catch(failResponse => {
+        })
+    }
+  },
+  mounted () {
+    this.$axios
+      .get('/login/createImg', {
+
+      })
+      .then(successResponse => {
+
+        if(successResponse.data.code === 200){
+          this.checkCode = successResponse.data.data.base64;
+          this.uuid = successResponse.data.data.uuid;
+        }
+      })
+      .catch(failResponse => {
+      })
+  }
+}
+
 </script>
 <style>
-   #paper {
-    background:url("../assets/img/bg/eva1.jpg") no-repeat;
-    background-position: center;
-    height: 100%;
-    width: 100%;
-    background-size: cover;
-    position: fixed;
-  }
-   body{
-     margin: -5px 0px;
-   }
   .login-container {
     border-radius: 15px;
     background-clip: padding-box;
-    margin: 90px auto;
+    margin: 250px auto;
     width: 350px;
-    padding: 35px 35px 15px 35px;
+    padding: 15px 35px 15px 35px;
     background: #fff;
     border: 1px solid #eaeaea;
     box-shadow: 0 0 25px #cac6c6;
   }
+
   .login_title {
     margin: 0px auto 40px auto;
     text-align: center;
     color: #505458;
   }
-  .login_remember {
-    margin: 0px 0px 35px 0px;
-    text-align: left;
+
+  #poster {
+   /* background:url("../assets/gelei/1.png") no-repeat;
+    background-position: center;
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+    position: fixed;*/
   }
-  /*.login_button {*/
-    /*background: #505458;*/
-  /*}*/
-  /*el_checkbox {*/
-    /*background: #505458;*/
-  /*}*/
+  body{
+    margin: 0px;
+  }
+
 </style>

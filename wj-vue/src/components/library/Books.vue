@@ -2,9 +2,8 @@
   <div>
     <el-row style="height: 840px;">
       <search-bar @onSearch="searchResult" ref="searchBar"></search-bar>
-      <view-switch class="switch"></view-switch>
       <el-tooltip effect="dark" placement="right"
-                  v-for="item in books.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+                  v-for="item in books"
                   :key="item.id">
         <p slot="content" style="font-size: 14px;margin-bottom: 6px;">{{item.title}}</p>
         <p slot="content" style="font-size: 13px;margin-bottom: 6px">
@@ -21,19 +20,18 @@
           <div class="info">
             <div class="title">
               <a href="">{{item.title}}</a>
+              <i class="el-icon-delete" @click="deleteBook(item.id)"></i>
             </div>
-            <i class="el-icon-delete" @click="deleteBook(item.id)"></i>
           </div>
           <div class="author">{{item.author}}</div>
         </el-card>
       </el-tooltip>
-      <edit-form @onSubmit="loadBooks()" ref="edit"></edit-form>
+      <edit-book @onSubmit="loadBooks()" ref="edit"></edit-book>
     </el-row>
     <el-row>
-      <el-pagination
-        @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-size="pagesize"
+      <el-pagination @current-change="handleCurrentChange"
+        :current-page="pageNo"
+        :page-size="pageSize"
         :total="books.length">
       </el-pagination>
     </el-row>
@@ -41,43 +39,52 @@
 </template>
 
 <script>
-  import EditForm from './EditForm'
+
+  import EditBook from './EditBook'
   import SearchBar from './SearchBar'
-  import ViewSwitch from './ViewSwitch'
 
   export default {
     name: 'Books',
-    components: {EditForm, SearchBar, ViewSwitch},
+    components: {EditBook,SearchBar},
     data () {
       return {
         books: [],
-        currentPage: 1,
-        pagesize: 17
+        pageSize:10,
+        pageNo:1
       }
     },
-    mounted: function () {
-      this.loadBooks()
+    mounted(){
+      this.loadBooks();
     },
-    methods: {
-      loadBooks () {
-        var _this = this
-        this.$axios.get('/books').then(resp => {
-          if (resp && resp.status === 200) {
-            _this.books = resp.data
+    methods:{
+      loadBooks(){
+        this.$axios.post('/books',{pageNo:this.pageNo,pageSize: this.pageSize}).then(result => {
+          if(result.data.code === 200){
+            this.books = result.data.data;
           }
         })
       },
-      handleCurrentChange: function (currentPage) {
-        this.currentPage = currentPage
+      editBook(item){
+
+        this.$refs.edit.dialogFormVisible = true;
+        this.$axios.post(item.id + '/detail',{}).then(result => {
+            if(result.data.code === 200){
+              this.$refs.edit.form =result.data.data;
+            }
+        })
+
+      },
+      handleCurrentChange: function (pageNo) {
+        this.pageNo = pageNo
       },
       searchResult () {
         var _this = this
         this.$axios
-          .post('/search', {
-            keywords: this.$refs.searchBar.keywords
+          .post(this.$refs.searchBar.keywords + '/search', {
+
           }).then(resp => {
-          if (resp && resp.status === 200) {
-            _this.books = resp.data
+          if (resp && resp.data.code === 200) {
+            //_this.books = resp.data.data
           }
         })
       },
@@ -87,9 +94,15 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
+            var ids = [];
+            ids.push(id);
             this.$axios
-              .post('/delete', {id: id}).then(resp => {
+              .post('/deleteByIds/'+ids).then(resp => {
               if (resp && resp.status === 200) {
+                this.$message({
+                  type: 'info',
+                  message: '已删除'
+                })
                 this.loadBooks()
               }
             })
@@ -102,30 +115,12 @@
         })
         // alert(id)
       },
-      editBook (item) {
-        this.$refs.edit.dialogFormVisible = true
-        this.$refs.edit.form = {
-          id: item.id,
-          cover: item.cover,
-          title: item.title,
-          author: item.author,
-          date: item.date,
-          press: item.press,
-          abs: item.abs,
-          category: {
-            id: item.category.id.toString(),
-            name: item.category.name
-          }
-        }
-        // this.$refs.edit.category = {
-        //   id: item.category.id.toString()
-        // }
-      }
+
     }
   }
 </script>
-<style scoped>
 
+<style scoped>
   .cover {
     width: 115px;
     height: 172px;
@@ -158,18 +153,6 @@
     line-height: 17px;
   }
 
-  .el-icon-delete {
-    cursor: pointer;
-    float: right;
-  }
-
-  .switch {
-    display: flex;
-    position: absolute;
-    left: 780px;
-    top: 25px;
-  }
-
   a {
     text-decoration: none;
   }
@@ -177,5 +160,8 @@
   a:link, a:visited, a:focus {
     color: #3377aa;
   }
-
+  .el-icon-delete {
+    cursor: pointer;
+    float: right;
+  }
 </style>
